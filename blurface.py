@@ -19,9 +19,10 @@ def getImage():
 
 def processImage(image):
     """
-    Purpose:
-    Parameters:
-    Returns:
+    Purpose: Modifies the image by applying canny, dilation, and countours of the image to 
+    identify the subject of the image and make the background black
+    Parameters: Given image
+    Returns: Cropped image
     (Chapters 6, 10, 11, & dilate)
     """
     # man: 10, 60
@@ -50,9 +51,10 @@ def processImage(image):
 
 def resizeBackground(imgName, crop):
     """
-    Purpose:
-    Parameters:
-    Returns:
+    Purpose: Find the dimensions of the cropped and background image, and make them both
+    the same size, based on the dimensions of the cropped image
+    Parameters: Background image and cropped image
+    Returns: Returns the resized background and unchanged cropped image.
     (Chapter 3 & resizing)
     """
     background = cv2.imread("beachback.jpg")
@@ -72,7 +74,13 @@ def resizeBackground(imgName, crop):
     return cropBack, resizedCrop
 
 def combineImages(resizedCrop, cropBack):
-
+    """
+    Purpose: Paste the cropped image onto the background by iterating through each pixel and
+    drawing the background onto the black (off) pixels of the cropped image  
+    Parameters: Cropped image and same dimension background
+    Returns: Returns the finished image with the cropped image over the background
+    (Combining images by looping through each pixel; variation on masking)
+    """
     finalImage = resizedCrop.copy()
     finalHeight, finalWidth, finalChannels = finalImage.shape
     print(finalHeight, finalWidth)
@@ -125,4 +133,3 @@ main()
 
 cv2.waitKey(0) 
 
-# th
