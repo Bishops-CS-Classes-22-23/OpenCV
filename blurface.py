@@ -17,7 +17,7 @@ def getImage():
     image = cv2.imread(args["image"])
     return image
 
-def processImage(image):
+def processImage(image, threshold1, threshold2):
     """
     Purpose: Modifies the image by applying canny, dilation, and countours of the image to 
     identify the subject of the image and make the background black
@@ -29,13 +29,13 @@ def processImage(image):
     # boy: 100, 200
     # rice: 100, 200
     # hw: 20, 175
-    canned = cv2.Canny(image, 20, 175)
+    canned = cv2.Canny(image, threshold1, threshold2)
     # cv2.imshow("Canny", canned)
 
     # apply mask (thick outline)
     kernel = np.ones((5,5),np.uint8)
     mask = cv2.dilate(canned, kernel, iterations = 1)
-    cv2.imshow("Mask real", mask)
+    # cv2.imshow("Mask real", mask)
 
     # find contours
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) 
@@ -57,7 +57,7 @@ def resizeBackground(imgName, crop):
     Returns: Returns the resized background and unchanged cropped image.
     (Chapter 3 & resizing)
     """
-    background = cv2.imread("beachback.jpg")
+    background = cv2.imread(imgName)
     # crop pic to fit image size
     backHeight, backWidth, backChannels = background.shape
     print("background:", backHeight, backWidth)
@@ -72,6 +72,38 @@ def resizeBackground(imgName, crop):
     # cv2.imshow("resizedCrop", resizedCrop)
 
     return cropBack, resizedCrop
+
+def blurImgBackground(image, crop):
+    """
+    Purpose:
+    Parameters:
+    Returns:
+    """
+
+    blurred = cv2.blur(image, (15, 15))
+    # cv2.imshow("original", image)
+    # cv2.imshow("blurred", blurred)
+
+    finalImage = crop.copy()
+    finalHeight, finalWidth, finalChannels = finalImage.shape
+    print(finalHeight, finalWidth)
+    for x in range(finalHeight):
+        for y in range(finalWidth):
+            # print(x,y)
+            b, g, r = finalImage[x,y]
+            # print(b, g, r)
+
+            # check if pixel in crop img is on/off
+            # if off: get pixel at exact location in background and draw onto black pixel
+            # if on: don't change
+            if b == 0 and g == 0 and r == 0:
+                # get pixel values of background
+                backPixel = blurred[x,y]
+                finalImage[x][y] = np.array(backPixel)
+   
+    return finalImage
+
+
 
 def combineImages(resizedCrop, cropBack):
     """
@@ -101,19 +133,52 @@ def combineImages(resizedCrop, cropBack):
     return finalImage
 
 
+
 def main():
 
-    image = getImage()
-
-    crop = processImage(image)
-
+    image = cv2.imread("boy.jpeg")
+    # man: 10, 60
+    # boy: 100, 200
+    # rice: 100, 200
+    # hw: 20, 175
+    # beach: 600, 150
+    crop = processImage(image, 100, 200)
+    blurFinal = blurImgBackground(image, crop)
     cropBack, resizedCrop = resizeBackground("beachback.jpg", crop)
+    boyBackFinal = combineImages(resizedCrop, cropBack)
+    cv2.imshow("Boy Background Final", boyBackFinal)
+    cv2.waitKey(0)
 
-    finalImage = combineImages(resizedCrop, cropBack)
+    image2 = cv2.imread("rice.jpeg")
+    # man: 10, 60
+    # boy: 100, 200
+    # rice: 100, 200
+    # hw: 20, 175
+    # beach: 600, 150
+    crop = processImage(image2, 100, 200)
+    blurFinal = blurImgBackground(image2, crop)
+    cropBack, resizedCrop = resizeBackground("beachback.jpg", crop)
+    riceBackFinal = combineImages(resizedCrop, cropBack)
+    cv2.imshow("Rice Background Final", riceBackFinal)
+    cv2.waitKey(0)
+
+    image3 = cv2.imread("hw.webp")
+    # man: 10, 60
+    # boy: 100, 200
+    # rice: 100, 200
+    # hw: 20, 175
+    # beach: 600, 150
+    crop = processImage(image3, 20, 175)
+    blurFinal = blurImgBackground(image3, crop)
+    cropBack, resizedCrop = resizeBackground("beachback.jpg", crop)
+    hwBackFinal = combineImages(resizedCrop, cropBack)
+    cv2.imshow("HW Background Final", hwBackFinal)
+    cv2.waitKey(0)
 
     # show 
-    cv2.imshow("cropped", crop)
-    cv2.imshow("Final", finalImage)
+    # cv2.imshow("cropped", crop)
+    # cv2.imshow("Original", image)
+    # cv2.imshow("Blurred Final", blurFinal)
 
 main()
 
