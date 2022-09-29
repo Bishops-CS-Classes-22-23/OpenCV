@@ -1,5 +1,5 @@
 # OpenCV
- OpenCV Project: Adding a Virtual Background To a Subject
+ OpenCV Project: Adding a Virtual Background To a Subject, DONE
 
 
 Chapters:

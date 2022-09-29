@@ -13,8 +13,8 @@ def processImage(image, threshold1, threshold2):
   
     canned = cv2.Canny(image, threshold1, threshold2)
 
-    # apply mask (thick outline)
-    kernel = np.ones((5,5),np.uint8)
+    # apply mask (thick outli ne)
+    kernel = np.ones((5,5), np.uint8)
     mask = cv2.dilate(canned, kernel, iterations = 1)
     # cv2.imshow("Mask real", mask)
 
@@ -23,7 +23,8 @@ def processImage(image, threshold1, threshold2):
     cv2.drawContours(mask, contours, -1, (255), -1)
     # cv2.imshow("crop mask", mask) 
     
-    # draw original image onto white parts of the crop mask
+    # draw original image onto white parts of the crop mask by first making crop img black, 
+    # then making all contoured pixels white 
     crop = np.zeros_like(image) 
     crop[mask == 255] = image[mask == 255]
 
